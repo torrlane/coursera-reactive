@@ -1,0 +1,4 @@
+/bin/
+target/*
+project/target/*
+web-ui/target/*

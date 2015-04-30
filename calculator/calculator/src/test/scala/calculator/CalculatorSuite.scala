@@ -50,5 +50,5 @@ class CalculatorSuite extends FunSuite with ShouldMatchers {
     val resultRed2 = TweetLength.colorForRemainingCharsCount(Var(-5))
     assert(resultRed2() == "red")
   }
-
+  
 }

@@ -51,4 +51,29 @@ class CalculatorSuite extends FunSuite with ShouldMatchers {
     assert(resultRed2() == "red")
   }
   
+  test("cycles"){
+    val expr = Ref("a")
+    val signal = Signal(expr) : Signal[Expr]
+    val input = Map("a" -> signal)
+    val values = Calculator.computeValues(input)
+    assert(values("a").apply().isNaN())
+  }
+  
+  test("Not there"){
+    val expr = Ref("b")
+    val signal = Signal(expr) : Signal[Expr]
+    val input = Map("a" -> signal)
+    val values = Calculator.computeValues(input)
+    assert(values("a").apply().isNaN())
+  }
+  
+  test("Success"){
+    val expr = Ref("b")
+    val signal = Signal(expr) : Signal[Expr]
+    val signalb = Signal(Literal(4)) : Signal[Expr]
+    val input = Map("a" -> signal, "b" -> signalb)
+    val values = Calculator.computeValues(input)
+    assert(values("a").apply() == 4)
+  }
+  
 }

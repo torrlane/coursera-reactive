@@ -8,10 +8,15 @@ object TweetLength {
   }
 
   def colorForRemainingCharsCount(remainingCharsCount: Signal[Int]): Signal[String] = {
-    Signal(
-      if (remainingCharsCount.apply() >= 15) "green"
-      else if (remainingCharsCount.apply() >= 0) "orange"
+    def lambda(): String = {
+      val count = remainingCharsCount.apply()
+      if (count >= 15) "green" 
+      else if (count >= 0) "orange"
       else "red"
+    }
+    
+    Signal(
+      lambda
     )
   }
 

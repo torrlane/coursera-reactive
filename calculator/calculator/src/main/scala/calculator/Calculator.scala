@@ -12,7 +12,7 @@ object Calculator {
   def computeValues(
       namedExpressions: Map[String, Signal[Expr]]): Map[String, Signal[Double]] = {
     
-    for((k,v) <- namedExpressions) yield   (k, Signal(eval(v (), namedExpressions)))
+    for((k,v) <- namedExpressions) yield   (k, Signal(eval(v (), namedExpressions-k)))
     
   }
 

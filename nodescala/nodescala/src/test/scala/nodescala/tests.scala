@@ -30,7 +30,35 @@ class NodeScalaSuite extends FunSuite {
       case t: TimeoutException => // ok!
     }
   }
+  
+  test("Future.now should return the result when completed") {
+    val f = Future(3)
+    assert(3 == f.now)
+  }
+  
+  test("Future.now should throw a NoSuchElementException when not completed") {
+    val f = Future(
+          Thread.sleep(1000)
+    )
+    try {
+        f.now
+        assert(false)
+    } catch {
+      case nsee: NoSuchElementException => // ok!
+    }
+  }
 
+  test("Future.continueWith should contain the continued value") {
+    def cont(t:Future[Int]):String = {
+      "5"
+    }
+    
+    val f = Future(5)
+    val f2 = f.continueWith { cont }
+    
+    assert(f2.now == "5")
+  }
+  
   test("CancellationTokenSource should allow stopping the computation") {
     val cts = CancellationTokenSource()
     val ct = cts.cancellationToken

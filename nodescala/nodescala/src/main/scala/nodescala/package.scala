@@ -98,7 +98,7 @@ package object nodescala {
      */
     def now: T = {
       
-      val duration = Duration(10, "millis")
+      val duration = Duration(1000, "millis")
       
       try {
       Await.result(f, duration)

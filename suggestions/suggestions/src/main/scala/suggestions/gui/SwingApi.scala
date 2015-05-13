@@ -10,6 +10,7 @@ import scala.util.{ Try, Success, Failure }
 import scala.swing.Reactions.Reaction
 import scala.swing.event.Event
 import rx.lang.scala.Observable
+import rx.lang.scala.Subscription
 
 /** Basic facilities for dealing with Swing-like components.
 *
@@ -46,12 +47,34 @@ trait SwingApi {
 
   implicit class TextFieldOps(field: TextField) {
 
-    /** Returns a stream of text field values entered in the given text field.
-      *
-      * @param field the text field
-      * @return an observable with a stream of text field updates
-      */
-    def textValues: Observable[String] = ???
+    /**
+     * Returns a stream of text field values entered in the given text field.
+     *
+     * @param field the text field
+     * @return an observable with a stream of text field updates
+     */
+    def textValues: Observable[String] = {
+
+      // Observable.create( Observer[T] -> Subscription )
+      Observable.create { observer =>
+        {
+
+          field.subscribe {
+            case ValueChanged(tf) => observer.onNext(tf.text)
+          }
+
+          new Subscription {
+            def apply(unsubscribe: => Unit): Subscription = {
+              field.unsubscribe( {
+                case ValueChanged(tf) => unsubscribe
+                }
+              )
+              this
+            }
+          }
+        }
+      }
+    }
 
   }
 
@@ -62,7 +85,24 @@ trait SwingApi {
      * @param field the button
      * @return an observable with a stream of buttons that have been clicked
      */
-    def clicks: Observable[Button] = ???
+    def clicks: Observable[Button] = {
+      // Observable.create( Observer[T] -> Subscription )
+      Observable.create { observer =>
+        {
+          button.subscribe {
+            case ButtonClicked(button) => observer.onNext(button)
+          }
+          new Subscription {
+            def apply(unsubscribe: => Unit): Subscription = {
+              button.unsubscribe( {
+                case ButtonClicked(button) => unsubscribe
+              })
+              this
+            }
+          }
+        }
+      }
+    }
   }
 
 }

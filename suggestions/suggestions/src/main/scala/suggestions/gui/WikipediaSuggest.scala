@@ -81,25 +81,43 @@ object WikipediaSuggest extends SimpleSwingApplication with ConcreteSwingApi wit
      */
 
     // TO IMPLEMENT
-    val searchTerms: Observable[String] = ???
+    val searchTerms: Observable[String] = searchTermField.textValues
 
     // TO IMPLEMENT
-    val suggestions: Observable[Try[List[String]]] = ???
+    // Next, use the searchTerms observable to create an observable of lists of suggestions 
+    // in which each list of suggestion corresponds to one search term. If any of the suggestion lists requests fail 
+    // (make sure you don’t wait forever), we would like to have the throwable to print the error message, 
+    // so we wrap the result into a Try. Use the methods defined earlier in the WikipediaApi:
+    val suggestions: Observable[Try[List[String]]] = searchTerms.timedOut(10).concatRecovered( term => wikiSuggestResponseStream(term) )
 
     // TO IMPLEMENT
+    // The suggestions observable should now be updated while you type. Problem is – there is no way to see these changes yet in the UI! 
+    // To display them, we need to update the contents of a component called suggestionList every time the 
+    // observable produces a value. If the suggestions value is not successful, we must print the error message into the 
+    // status label. Use the subscribe method on suggestions to do this:
     val suggestionSubscription: Subscription =  suggestions.observeOn(eventScheduler) subscribe {
-      x => ???
+      x => x match {
+        case Success(list) => suggestionList.listData = list
+        case Failure(e) => status.text = e.getMessage
+      }
     }
 
     // TO IMPLEMENT
-    val selections: Observable[String] = ???
+    // Your next task will be to obtain an observable (selections) of button clicks that contains the search terms selected 
+    // in the suggestion list at the time the button was clicked. If the suggestion list had no items selected, 
+    // then the click should not be part of selections.
+    //TODO
+    val selections: Observable[String] = button.clicks.filter(_ => !suggestionList.listData.isEmpty).map { _ => suggestionList.selection.items.head }
 
     // TO IMPLEMENT
-    val pages: Observable[Try[String]] = ???
+    val pages: Observable[Try[String]] = selections.concatRecovered( term => wikiPageResponseStream(term))
 
     // TO IMPLEMENT
     val pageSubscription: Subscription = pages.observeOn(eventScheduler) subscribe {
-      x => ???
+      x => x match {
+        case Success(p) => editorpane.text = p
+        case Failure(e) => println(e)
+      }
     }
 
   }
